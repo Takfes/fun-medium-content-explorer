@@ -1,5 +1,5 @@
 COLLECTIONS = {
-    "reading_list": "predefined:d4e5eb62612a:READING_LIST",
+    # "reading_list": "predefined:d4e5eb62612a:READING_LIST",
     "bigbucket": "ad0ccd4f6489",
     "datamgmt": "44856db45c3a",
     "datamnl": "3a4757486b6f",
