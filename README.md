@@ -14,7 +14,7 @@
 
 - how to create virtual env : `virtualenv venv`
 - how to activate the env : `. venv/bin/activate`
-- how to collect dependencies : `pip list > requirements.txt`
+- how to collect dependencies : `pip freeze | grep -v "^\-e" > requirements.txt`
 - how to deactivate the env : `deactivate`
 - how to install the package : `pip install -e .`
 - how to run process : `scrape`
