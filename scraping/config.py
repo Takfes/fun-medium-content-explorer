@@ -1,4 +1,4 @@
-LIBRARY = {
+COLLECTIONS = {
     "reading_list": "predefined:d4e5eb62612a:READING_LIST",
     "bigbucket": "ad0ccd4f6489",
     "datamgmt": "44856db45c3a",
@@ -8,15 +8,17 @@ LIBRARY = {
     "dl": "2f99be9c9578",
     "rl": "a42e2f4bad7e",
     "or": "142ee2d75832",
-    "stats": "0af484e1dccb",
+    "ts": "b8417b51121f",
     "quants": "ff748e184c09",
+    "stats": "0af484e1dccb",
     "text": "24d12e1857da",
     "pydev": "1b047f3fe644",
-    "ts": "b8417b51121f",
     "clf": "c878e182c252",
     "rgr": "1d6ac2c83e12",
     "dynpr": "3a685e3952d5",
 }
+
+DATA_FOLDER = "data"
 
 REQUEST_URL = "https://medium.com/_/graphql"
 
