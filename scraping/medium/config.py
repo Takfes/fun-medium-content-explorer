@@ -18,7 +18,7 @@ COLLECTIONS = {
     "dynpr": "3a685e3952d5",
 }
 
-DATA_FOLDER = "data"
+DATA_FOLDER = "data/bronze"
 
 REQUEST_URL = "https://medium.com/_/graphql"
 
