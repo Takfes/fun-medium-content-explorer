@@ -1,11 +1,5 @@
-import json
-import logging
-import time
-from datetime import datetime
 from pathlib import Path
 
-import pandas as pd
-from goose3 import Goose
 from tqdm import tqdm
 
 from parsing.config import READ_FOLDER, SAVE_FOLDER
@@ -13,12 +7,7 @@ from parsing.myio import dump_to_path, load_from_path
 
 
 def parse_url(url):
-    try:
-        g = Goose()
-        article = g.extract(url=url)
-        return article.cleaned_text.replace("\n", "")
-    except:
-        return "<missing>"
+    pass
 
 
 if __name__ == "__main__":
