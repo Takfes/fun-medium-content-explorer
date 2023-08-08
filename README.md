@@ -4,6 +4,7 @@
 2. how to activate the env : `. venv/bin/activate`
 3. how to install the package : `pip install -e .`
 4. how to deactivate the env : `deactivate`
+5. `docker-compose -f docker-compose-redis.yaml up -d`
 
 > run `pip freeze | grep -v "^\-e" > requirements.txt` when **new packages are installed**, to include them in the `requirements.txt`. these will build everytime you `pip install -e .`
 

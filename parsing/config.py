@@ -1,2 +1,3 @@
-READ_FOLDER = "data/bronze"
-SAVE_FOLDER = "data/silver"
+FOLDER_BRONZE = "data/bronze"
+FOLDER_SILVER = "data/silver"
+FOLDER_GOLD = "data/gold"
