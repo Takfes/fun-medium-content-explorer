@@ -69,7 +69,7 @@ def login(headless=True):
 
 with sync_playwright() as p:
     # login to medium
-    login(False)
+    login(headless=False)
 
     # connect to REDIS
     r = redis.Redis(host="localhost", port=6379, db=0)
