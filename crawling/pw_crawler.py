@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 from tqdm import tqdm
 
-from parsing.config import FOLDER_SILVER
-from parsing.keys import EMAIL, PASSWORD
+from crawling.config import FOLDER_SILVER
+from crawling.keys import EMAIL, PASSWORD
 
 SLEEP = 2
 LANGING_PAGE = "https://medium.com/m/signin"
