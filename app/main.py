@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 import streamlit as st
@@ -15,7 +16,7 @@ def connect_mongodb():
 
 
 @st.cache_data()
-def mongo_search_text(searchterm: str, whole_string: bool = False, limit: int = 100) -> List:
+def mongo_search(searchterm: str, whole_string: bool = False, limit: int = 100) -> List:
     if whole_string:
         searchterm = '"' + searchterm + '"'
     # Define the search query
@@ -30,7 +31,47 @@ def mongo_search_text(searchterm: str, whole_string: bool = False, limit: int = 
     return [x for x in result]
 
 
-def make_html(thumbnail, title, url, author, claps, reading_time, tags):
+def render_sidebar():
+    filters = {}
+    # Enable result limits
+    if st.sidebar.checkbox("📏 Enable result limits"):
+        filters["results_limit"] = st.sidebar.slider(
+            label="Select range for results to show",
+            min_value=5,
+            max_value=1_000,
+            value=20,
+        )
+    # Reading time filter
+    if st.sidebar.checkbox("⏰ Enable reading time filter"):
+        filters["reading_time"] = st.sidebar.slider(
+            label="Select range for reading time",
+            min_value=0,
+            max_value=90,
+            value=(5, 20),
+        )
+    # Date filter - applies to publication date
+    if st.sidebar.checkbox("🗓 Enable date filter"):
+        min_date = datetime.datetime(2015, 1, 1)
+        max_date = datetime.datetime(2023, 12, 31)
+        start_date, end_date = st.sidebar.date_input(
+            "Select a date range:",
+            min_value=min_date,
+            max_value=max_date,
+            value=(min_date, max_date),
+        )
+        filters["start_date"] = start_date.strftime("%Y-%m-%d")
+        filters["end_date"] = end_date.strftime("%Y-%m-%d")
+    # Search term match - partial or full
+    filters["whole_string"] = st.sidebar.checkbox("🎚 Search term full match")
+    # Claps filter
+    if st.sidebar.checkbox("👏 Enable claps filter"):
+        filters["claps_limits"] = st.sidebar.slider(
+            label="Select range for claps", min_value=0, max_value=30_000, value=(100, 1_000)
+        )
+    return filters
+
+
+def html_component(thumbnail, title, url, author, claps, reading_time, tags):
     tags_html = ", ".join(tags[:3])
     html = f"""
     <div class="result-box">
@@ -71,6 +112,7 @@ load_css("app/styles.css")
 if "results" not in st.session_state:
     st.session_state.results = []
 
+render_sidebar()
 collection = connect_mongodb()
 st.header("Search Articles")
 
@@ -82,7 +124,7 @@ if searchterm:
     # Check if the search term has changed
     if "searchterm" not in st.session_state or st.session_state.searchterm != searchterm:
         st.session_state.searchterm = searchterm
-        st.session_state.results = mongo_search_text(searchterm)
+        st.session_state.results = mongo_search(searchterm)
 
     # Display the results
 
@@ -92,7 +134,7 @@ if searchterm:
     #     )
 
     for item in st.session_state.results:
-        html = make_html(
+        html = html_component(
             thumbnail=item["top_image"],
             title=item["title"],
             url=item["medium_url"],
