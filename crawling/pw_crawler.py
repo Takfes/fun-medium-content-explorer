@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 from tqdm import tqdm
 
-from crawling.config import FOLDER_SILVER
+from config import FOLDER_SILVER
 from crawling.keys import EMAIL, PASSWORD
 
 SLEEP = 2

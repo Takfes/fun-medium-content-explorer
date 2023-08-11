@@ -7,7 +7,7 @@ setup(
     name="myscrapers",
     version="0.0.1",
     install_requires=requirements,
-    py_modules=["scraping", "crawling"],
+    py_modules=["scraping", "crawling", "parsing", "config"],
     entry_points={
         "console_scripts": [
             "scrape = scraping.main:default",
