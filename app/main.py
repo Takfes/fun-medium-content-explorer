@@ -30,6 +30,39 @@ def mongo_search_text(searchterm: str, whole_string: bool = False, limit: int = 
     return [x for x in result]
 
 
+def make_html(thumbnail, title, url, author, claps, reading_time, tags):
+    tags_html = ", ".join(tags[:3])
+    html = f"""
+    <div class="result-box">
+        <div class="image-container">
+            <a href="{url}" target="_blank">
+                <img src="{thumbnail}" alt="{title}" class="thumbnail">
+            </a>
+        </div>
+        <div class="content-container">
+            <a href="{url}" target="_blank" class="title">{title}</a>
+            <div class="author-tags">
+                <span class="author">By {author}</span> &middot;
+                <span class="tags">{tags_html}</span>
+            </div>
+            <div class="claps-reading">
+                <span class="claps">👏 {claps}</span> &middot;
+                <span class="reading-time">⏰ {reading_time:.1f} min</span>
+            </div>
+        </div>
+    </div>
+    """
+    return html
+
+
+def load_css(file_name):
+    with open(file_name) as f:
+        css = f.read()
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+
+load_css("app/styles.css")
+
 # ===============================================
 # Main Streamlit App
 # ===============================================
@@ -52,9 +85,23 @@ if searchterm:
         st.session_state.results = mongo_search_text(searchterm)
 
     # Display the results
-    for i, item in enumerate(st.session_state.results, start=1):
-        st.write(
-            f"{i}) {item['title']} ⏰ {item['reading_time']:.1f} 👏 {item['claps']} \n 🏷 {item['tags']}\n"
+
+    # for i, item in enumerate(st.session_state.results, start=1):
+    #     st.write(
+    #         f"{i}) {item['title']} ⏰ {item['reading_time']:.1f} 👏 {item['claps']} \n 🏷 {item['tags']}\n"
+    #     )
+
+    for item in st.session_state.results:
+        html = make_html(
+            thumbnail=item["top_image"],
+            title=item["title"],
+            url=item["medium_url"],
+            author=item["author"],
+            claps=item["claps"],
+            reading_time=item["reading_time"],
+            tags=item["tags"],
         )
+        st.markdown(html, unsafe_allow_html=True)
+
 else:
     st.write("Enter a search term to see results.")
