@@ -1,0 +1,10 @@
+README.md
+config.py
+pyproject.toml
+setup.py
+chicken.egg-info/PKG-INFO
+chicken.egg-info/SOURCES.txt
+chicken.egg-info/dependency_links.txt
+chicken.egg-info/entry_points.txt
+chicken.egg-info/requires.txt
+chicken.egg-info/top_level.txt
