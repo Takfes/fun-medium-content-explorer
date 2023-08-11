@@ -16,18 +16,39 @@ def connect_mongodb():
 
 
 @st.cache_data()
-def mongo_search(searchterm: str, whole_string: bool = False, limit: int = 100) -> List:
-    if whole_string:
+def mongo_search(searchterm: str, filters: dict, limit: int = 100) -> List:
+    # Check if whole_string is set in filters
+    if filters.get("whole_string"):
         searchterm = '"' + searchterm + '"'
-    # Define the search query
+    # Define the base search query
     query = {"$text": {"$search": searchterm}}
     score = {"score": {"$meta": "textScore"}}
-    # Execute the query and sort by claps in descending order
+
+    # Apply reading time filter
+    if "reading_time" in filters:
+        reading_time_min, reading_time_max = filters["reading_time"]
+        query["reading_time"] = {"$gte": reading_time_min, "$lte": reading_time_max}
+
+    # Apply date filter
+    if "minimum_date" in filters:
+        query["publication_date"] = {"$gte": filters["minimum_date"]}
+
+    # Apply claps filter
+    if "claps_limits" in filters:
+        claps_min = filters["claps_limits"]
+        query["claps"] = {"$gte": claps_min}
+
+    # Modify the result limit if set in filters
+    if "results_limit" in filters:
+        limit = filters["results_limit"]
+
+    # Execute the query and sort by text score in descending order
     result = (
         collection.find(query, projection=score)
         .sort([("score", {"$meta": "textScore"})])
         .limit(limit)
     )
+
     return [x for x in result]
 
 
@@ -38,8 +59,8 @@ def render_sidebar():
         filters["results_limit"] = st.sidebar.slider(
             label="Select range for results to show",
             min_value=5,
-            max_value=1_000,
-            value=20,
+            max_value=250,
+            value=10,
         )
     # Reading time filter
     if st.sidebar.checkbox("⏰ Enable reading time filter"):
@@ -50,28 +71,26 @@ def render_sidebar():
             value=(5, 20),
         )
     # Date filter - applies to publication date
-    if st.sidebar.checkbox("🗓 Enable date filter"):
+    if st.sidebar.checkbox("🗓 Enable minimum publication date filter"):
+        default_date = datetime.datetime(2020, 1, 1)
         min_date = datetime.datetime(2015, 1, 1)
-        max_date = datetime.datetime(2023, 12, 31)
-        start_date, end_date = st.sidebar.date_input(
+        minimum_date = st.sidebar.date_input(
             "Select a date range:",
             min_value=min_date,
-            max_value=max_date,
-            value=(min_date, max_date),
+            value=default_date,
         )
-        filters["start_date"] = start_date.strftime("%Y-%m-%d")
-        filters["end_date"] = end_date.strftime("%Y-%m-%d")
+        filters["minimum_date"] = minimum_date.strftime("%Y-%m-%d")
     # Search term match - partial or full
     filters["whole_string"] = st.sidebar.checkbox("🎚 Search term full match")
     # Claps filter
     if st.sidebar.checkbox("👏 Enable claps filter"):
         filters["claps_limits"] = st.sidebar.slider(
-            label="Select range for claps", min_value=0, max_value=30_000, value=(100, 1_000)
+            label="Select minimum # of claps", min_value=0, max_value=1000, value=100
         )
     return filters
 
 
-def html_component(thumbnail, title, url, author, claps, reading_time, tags):
+def html_component(thumbnail, title, url, author, claps, reading_time, tags, publication_date):
     tags_html = ", ".join(tags[:3])
     html = f"""
     <div class="result-box">
@@ -88,7 +107,8 @@ def html_component(thumbnail, title, url, author, claps, reading_time, tags):
             </div>
             <div class="claps-reading">
                 <span class="claps">👏 {claps}</span> &middot;
-                <span class="reading-time">⏰ {reading_time:.1f} min</span>
+                <span class="reading-time">⏰ {reading_time:.1f} min</span> &middot;
+                <span class="publication-date">🗓 {publication_date}</span>
             </div>
         </div>
     </div>
@@ -112,7 +132,7 @@ load_css("app/styles.css")
 if "results" not in st.session_state:
     st.session_state.results = []
 
-render_sidebar()
+search_filters = render_sidebar()
 collection = connect_mongodb()
 st.header("Search Articles")
 
@@ -124,7 +144,7 @@ if searchterm:
     # Check if the search term has changed
     if "searchterm" not in st.session_state or st.session_state.searchterm != searchterm:
         st.session_state.searchterm = searchterm
-        st.session_state.results = mongo_search(searchterm)
+        st.session_state.results = mongo_search(searchterm, filters=search_filters)
 
     # Display the results
 
@@ -141,6 +161,7 @@ if searchterm:
             author=item["author"],
             claps=item["claps"],
             reading_time=item["reading_time"],
+            publication_date=item["publication_date"],
             tags=item["tags"],
         )
         st.markdown(html, unsafe_allow_html=True)
