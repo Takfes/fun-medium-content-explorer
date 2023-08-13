@@ -5,12 +5,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setup(
     name="chicken",
-    version="0.1.1",
+    version="1.0.0",
     install_requires=requirements,
-    py_modules=["scraping", "crawling", "parsing", "config"],
-    entry_points={
-        "console_scripts": [
-            "scrape = scraping.main:default",
-        ]
-    },
+    py_modules=["scraping", "crawling", "parsing", "config"]
 )
