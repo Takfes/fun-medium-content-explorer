@@ -1,13 +1,9 @@
 import datetime
 from typing import List
+
 import requests
 
-from scraping.config import (
-    COLLECTIONS,
-    REQUEST_LIMIT,
-    REQUEST_QUERY,
-    REQUEST_URL,
-)
+from scraping.config import COLLECTIONS, REQUEST_LIMIT, REQUEST_QUERY, REQUEST_URL
 
 
 def _create_payload(catalogid: str, limit: int = REQUEST_LIMIT, offset: int = 0):
@@ -32,17 +28,17 @@ def _parse_item(item):
         parsed = {
             "title": item["entity"]["title"],
             "subtitle": item["entity"]["extendedPreviewContent"]["subtitle"],
-            "mediumid": item["entity"]["id"],
+            "id": item["entity"]["id"],
+            "url": item["entity"]["mediumUrl"],
             "author": item["entity"]["creator"]["name"],
             "author_followers": item["entity"]["creator"]["socialStats"]["followerCount"],
             "publication_date": _parse_timestamp(item["entity"]["firstPublishedAt"]),
-            "is_locked": item["entity"]["isLocked"],
-            "is_series": item["entity"]["isSeries"],
             "reading_time": item["entity"]["readingTime"],
-            "medium_url": item["entity"]["mediumUrl"],
             "claps": item["entity"]["clapCount"],
             "tags": [x.get("id") for x in item["entity"]["tags"]],
-            # "collection": item["entity"].get("collection").get("name"),
+            "is_locked": item["entity"]["isLocked"],
+            "collection": item["entity"].get("collection").get("name"),
+            # "is_series": item["entity"]["isSeries"],
         }
         return parsed
     except Exception as e:
@@ -70,7 +66,7 @@ def _response_parser(response):
     return parsed_items
 
 
-def scraper(key:str, limit:int)->List:
+def scraper(key: str, limit: int) -> List:
     # determine parameters
     collection_value = COLLECTIONS[key]
     myoffset = 0

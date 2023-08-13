@@ -1,6 +1,7 @@
 README.md
 config.py
 pyproject.toml
+secretkeys.py
 setup.py
 chicken.egg-info/PKG-INFO
 chicken.egg-info/SOURCES.txt

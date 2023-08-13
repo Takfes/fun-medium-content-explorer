@@ -3,8 +3,13 @@ version: "3.8"
 services:
   redis:
     image: redis:latest
+    container_name: my_redis
     ports:
       - "6379:6379"
     volumes:
-      - ./data/redis:/data
+      - ./data/redis:/data # Bind mount
+      # - redisdata:/data # Named volume
     command: redis-server --appendonly yes
+
+volumes:
+  redisdata: # Named volume

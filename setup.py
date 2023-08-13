@@ -7,5 +7,5 @@ setup(
     name="chicken",
     version="1.0.0",
     install_requires=requirements,
-    py_modules=["scraping", "crawling", "parsing", "config"]
+    py_modules=["scraping", "crawling", "parsing", "config", "secretkeys"],
 )

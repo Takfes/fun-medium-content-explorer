@@ -1,24 +1,23 @@
 COLLECTIONS = {
-    # "reading_list": "predefined:d4e5eb62612a:READING_LIST",
+    "reading_list": "predefined:d4e5eb62612a:READING_LIST",
     "bigbucket": "ad0ccd4f6489",
-    "datamgmt": "44856db45c3a",
-    "datamnl": "3a4757486b6f",
-    "mlops": "dc43648e4ad4",
-    "ml": "24868f0db1cd",
-    "dl": "2f99be9c9578",
-    "rl": "a42e2f4bad7e",
-    "or": "142ee2d75832",
-    "ts": "b8417b51121f",
+    "datamanagement": "44856db45c3a",
+    "datamanipulation": "3a4757486b6f",
+    "mlopstools": "dc43648e4ad4",
+    "machinelearning": "24868f0db1cd",
+    "deeplearning": "2f99be9c9578",
+    "reinforcementlearning": "a42e2f4bad7e",
+    "operationsresearch": "142ee2d75832",
+    "timeseires": "b8417b51121f",
     "quants": "ff748e184c09",
-    "stats": "0af484e1dccb",
-    "text": "24d12e1857da",
-    "pydev": "1b047f3fe644",
-    "clf": "c878e182c252",
-    "rgr": "1d6ac2c83e12",
-    "dynpr": "3a685e3952d5",
+    "statsmaths": "0af484e1dccb",
+    "llmnlptextdata": "24d12e1857da",
+    "pythondeveloper": "1b047f3fe644",
+    "classiciations": "c878e182c252",
+    "regressions": "1d6ac2c83e12",
 }
 
-DATA_FOLDER = "data/bronze"
+DATA_FOLDER = "data/01_raw"
 
 REQUEST_URL = "https://medium.com/_/graphql"
 
