@@ -2,12 +2,12 @@ import pickle
 
 from pymongo import MongoClient
 
-from config import FOLDER_GOLD
+from config import FOLDER_GOLD, MONGO_COLLECTION, MONGO_DB, MONGO_HOST
 
 # ===============================================
 # Connect to Mongodb
 # ==============================================
-client = MongoClient("localhost", 27017)
+client = MongoClient(MONGO_HOST, 27017)
 
 # List all databases
 dbs = client.list_database_names()
@@ -29,8 +29,8 @@ for i, db_name in enumerate(dbs, start=1):
 # # Delete a collection
 # db.drop_collection("my_collection")
 
-db = client["db"]
-collection = db["my_collection"]
+db = client[MONGO_DB]
+collection = db[MONGO_COLLECTION]
 
 # ===============================================
 # Read data

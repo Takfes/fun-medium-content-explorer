@@ -52,7 +52,7 @@ print(f"Iterate over {counter} raw items\nFound {len(set(data.keys()))} unique i
 
 bronzepath = Path(FOLDER_BRONZE)
 
-with open(f"{bronzepath}/itemswdis.json", "w", encoding="utf-8") as file:
+with open(f"{bronzepath}/bronzemaster.json", "w", encoding="utf-8") as file:
     json.dump(data, file)
 
 # ===============================================

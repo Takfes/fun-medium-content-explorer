@@ -4,15 +4,17 @@ from typing import List
 import streamlit as st
 from pymongo import MongoClient
 
+from config import MONGO_COLLECTION, MONGO_DB, MONGO_HOST
+
 # ===============================================
 # Function Definitions
 # ===============================================
 
 
 def connect_mongodb():
-    client = MongoClient("localhost", 27017)
-    db = client["db"]
-    return db["my_collection"]
+    client = MongoClient(MONGO_HOST, 27017)
+    db = client[MONGO_DB]
+    return db[MONGO_COLLECTION]
 
 
 @st.cache_data()

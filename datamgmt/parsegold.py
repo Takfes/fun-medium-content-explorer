@@ -8,9 +8,8 @@ from typing import Dict
 
 from bs4 import BeautifulSoup
 from newspaper import Article
-from tqdm import tqdm
 
-from config import FOLDER_BRONZE, FOLDER_GOLD, FOLDER_SILVER
+from config import FOLDER_ALERTS, FOLDER_BRONZE, FOLDER_GOLD, FOLDER_SILVER
 
 
 def clean_text(text, to_lower=False):
@@ -49,38 +48,20 @@ def auto_parse_html(soup: BeautifulSoup) -> Dict:
 
 
 # ===============================================
-# Merge all bronze items into a single file, master.
-# master = {mediumid : {}, mediumid : {}}
-# ===============================================
-
-readpath = Path(FOLDER_BRONZE)
-bronzefiles = list(readpath.glob("*.json"))
-master = {}
-
-print(50 * "=")
-print(f"\nConsolidating bronze data into a single master file...")
-
-for bf in bronzefiles:
-    with open(bf, "r", encoding="utf-8") as file:
-        collection = json.load(file)
-        for c in collection:
-            try:
-                master[c.get("mediumid")] = c
-            except Exception as e:
-                print(f"{bf.stem}")
-                print(c)
-
-print(f"Created master with {len(master.keys())} items")
-
-# ===============================================
 # Iterate through master items
 # For each master item, search in silver based on key <key>.html
 # then parse <k>.html and append/update info to master like so:
 # master = {mediumid : {... + parsed info}, mediumid : {... + parsed info}}
 # ===============================================
 
+bronzepath = Path(FOLDER_BRONZE)
+bronzefile = list(bronzepath.iterdir())[0]
+with open(bronzefile, "r", encoding="utf-8") as file:
+    master = json.load(file)
+
 counter = 1
-fails = []
+failed = []
+missing = []
 
 start = time.perf_counter()
 
@@ -91,6 +72,7 @@ for k, v in master.items():
     temp_path = f"{FOLDER_SILVER}/{k}.html"
 
     if not os.path.exists(temp_path):
+        missing.append(temp_path)
         continue
 
     try:
@@ -98,30 +80,38 @@ for k, v in master.items():
             html = file.read()
             parsed_html = auto_parse_html(html)
 
-        # delete key 'is_series' before adding to master data
-        del master[k]["is_series"]
         # clean text before adding to master data
         parsed_html["text"] = clean_text(parsed_html["text"])
         # update master data for item k with parsed_html keys
+        # update items based on the auto_parse_html function :
+        # tog_image, images, tags, text
         master.get(k).update(parsed_html)
         print(f"Parsed item ({counter}/{len(master.keys())}): {k}")
         counter += 1
 
     except Exception as e:
-        fails.append(k)
+        failed.append(k)
         # delete the item if its html couldn't be parsed
         del master[k]
         print(f"Failed to parse html content for {k}")
-        print(f"Running fails {len(fails)}")
+        print(f"Running failed {len(failed)}")
 
 end = time.perf_counter()
 
 print(f"Parsed {counter} in {end-start:.4f} seconds")
-print(f"Failed to parse {len(fails)=} items")
+print(f"Failed to parse {len(failed)=} items")
+print(f"Detected {len(missing)=} missing files")
 
 # ===============================================
 # Write final object to disk
+# Write missing and failed to disk
 # ===============================================
 
 with open(f"{FOLDER_GOLD}/master.pickle", "wb") as m:
     pickle.dump(master, m)
+
+with open(f"{FOLDER_ALERTS}/missing.pickle", "wb") as m:
+    pickle.dump(missing, m)
+
+with open(f"{FOLDER_ALERTS}/failed.pickle", "wb") as m:
+    pickle.dump(failed, m)

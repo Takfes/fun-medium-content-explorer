@@ -2,9 +2,11 @@ from typing import List
 
 from pymongo import DESCENDING, MongoClient
 
-client = MongoClient("localhost", 27017)
-db = client["db"]
-collection = db["my_collection"]
+from config import MONGO_COLLECTION, MONGO_DB, MONGO_HOST
+
+client = MongoClient(MONGO_HOST, 27017)
+db = client[MONGO_DB]
+collection = db[MONGO_COLLECTION]
 
 # ===============================================
 # Manipulate indices
@@ -33,7 +35,7 @@ collection.drop_index("title_index")
 
 def mngdb_search_text(searchterm: str, whole_string: bool = False, limit: int = 100) -> List:
     if whole_string:
-        searchterm = '\"' + searchterm + '\"'
+        searchterm = '"' + searchterm + '"'
     # Define the search query
     query = {"$text": {"$search": searchterm}}
     score = {"score": {"$meta": "textScore"}}
@@ -44,6 +46,7 @@ def mngdb_search_text(searchterm: str, whole_string: bool = False, limit: int = 
         .limit(limit)
     )
     return [x for x in result]
+
 
 results = mngdb_search_text("operations research", True)
 
