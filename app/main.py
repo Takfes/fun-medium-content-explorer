@@ -159,7 +159,7 @@ if searchterm:
         html = html_component(
             thumbnail=item["top_image"],
             title=item["title"],
-            url=item["medium_url"],
+            url=item["url"],
             author=item["author"],
             claps=item["claps"],
             reading_time=item["reading_time"],

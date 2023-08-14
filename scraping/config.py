@@ -8,7 +8,7 @@ COLLECTIONS = {
     "deeplearning": "2f99be9c9578",
     "reinforcementlearning": "a42e2f4bad7e",
     "operationsresearch": "142ee2d75832",
-    "timeseires": "b8417b51121f",
+    "timeseries": "b8417b51121f",
     "quants": "ff748e184c09",
     "statsmaths": "0af484e1dccb",
     "llmnlptextdata": "24d12e1857da",

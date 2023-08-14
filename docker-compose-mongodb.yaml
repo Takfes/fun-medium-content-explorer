@@ -9,6 +9,5 @@ services:
     volumes:
       - ./data/mongo:/data/db # Bind mount
       # - mongodata:/data/db # Named volume
-
-volumes:
-  mongodata:
+# volumes:
+#   mongodata:

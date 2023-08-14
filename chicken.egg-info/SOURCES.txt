@@ -1,5 +1,6 @@
 README.md
 config.py
+helpers.py
 pyproject.toml
 secretkeys.py
 setup.py

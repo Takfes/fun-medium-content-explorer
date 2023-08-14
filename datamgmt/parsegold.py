@@ -65,6 +65,7 @@ missing = []
 
 start = time.perf_counter()
 
+print(f"items in master : {len(master.keys())}")
 print(50 * "=")
 print(f"\nParsing silver data in the master file from above...")
 
@@ -75,10 +76,11 @@ for k, v in master.items():
         missing.append(temp_path)
         continue
 
+    with open(temp_path, "r", encoding="utf-8") as file:
+        html = file.read()
+
     try:
-        with open(temp_path, "r", encoding="utf-8") as file:
-            html = file.read()
-            parsed_html = auto_parse_html(html)
+        parsed_html = auto_parse_html(html)
 
         # clean text before adding to master data
         parsed_html["text"] = clean_text(parsed_html["text"])
@@ -91,8 +93,6 @@ for k, v in master.items():
 
     except Exception as e:
         failed.append(k)
-        # delete the item if its html couldn't be parsed
-        del master[k]
         print(f"Failed to parse html content for {k}")
         print(f"Running failed {len(failed)}")
 

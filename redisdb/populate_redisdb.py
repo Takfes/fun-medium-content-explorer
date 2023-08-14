@@ -35,7 +35,7 @@ for f in stagepath.iterdir():
     print(f"* items {f} sent to the queue")
     print(f"* deleting items {f}\n")
     counter += len(data)
-    # f.unlink()
+    f.unlink()
 
 end = time.perf_counter()
 print(f"Pushed {counter} items in {end-start:.4f}")

@@ -10,26 +10,31 @@ from config import FOLDER_BRONZE, FOLDER_RAW, FOLDER_SILVER, FOLDER_STAGE
 
 rawpath = Path(FOLDER_RAW)
 
-counter = 0
+cum_cntr = 0
+cum_list = 0
 data = {}  # TODO implement a custom dataclass
 
 # iterate through raw files
 for path in rawpath.iterdir():
-    user_collection = path.stem.split("|")[0]
+    pile = path.stem.split("|")[0]
 
     # don't parse the reading_list collection
-    if user_collection == "reading_list":
+    if pile == "reading_list":
+        path.unlink()
         continue
 
+    counter = 0
     # for any other collection, open its collection_list
     with open(path, "r", encoding="utf-8") as f:
         collection_list = json.load(f)
+
+    cum_list += len(collection_list)
 
     # iterate across items from collection list
     # discard empty items which seem to exist
     # scope is to create a consolidated data structure to hold all items
     # if an item appears in more than one list, ...
-    # ... update its user_collection attribute with the different lists that is part of
+    # ... update its pile attribute with the different lists that is part of
     for i, item in enumerate(collection_list):
         if not item:  # discard empty items which seem to exist
             continue
@@ -37,14 +42,20 @@ for path in rawpath.iterdir():
         counter += 1
 
         if not item["id"] in set(data.keys()):
-            item["user_collection"] = [user_collection]
+            item["pile"] = [pile]
             data[item["id"]] = item
 
         elif item["id"] in set(data.keys()):
             existing_item = data[item["id"]]
-            data[item["id"]]["user_collection"].append(user_collection)
+            data[item["id"]]["pile"].append(pile)
 
-print(f"Iterate over {counter} raw items\nFound {len(set(data.keys()))} unique items")
+    print(
+        f"* Collection {pile} | {counter}/{len(collection_list)} - ({counter/len(collection_list):.1%})"
+    )
+    cum_cntr += counter
+    path.unlink()
+
+print(f"Iterate over {cum_cntr} raw items\nFound {len(set(data.keys()))} unique items")
 
 # ===============================================
 # Add parsed|consolidated raw files to bronze folder

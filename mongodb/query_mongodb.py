@@ -9,24 +9,28 @@ db = client[MONGO_DB]
 collection = db[MONGO_COLLECTION]
 
 # ===============================================
-# Manipulate indices
+# List databases and collections
 # ===============================================
 
-# list indexes
-indexes = collection.list_indexes()
-for index in indexes:
-    print(index["name"])
+# List all databases
+dbs = client.list_database_names()
+for i, db_name in enumerate(dbs, start=1):
+    print(f"{i}) Database : {db_name}")
+    # List all collections in a database
+    db = client[db_name]
+    collections = db.list_collection_names()
+    for j, collection_name in enumerate(collections, start=1):
+        print(f"  {j}) Collection : {db_name}.{collection_name}")
 
-# Create index
-collection.create_index(
-    [("title", "text"), ("subtitle", "text"), ("text", "text")], name="multitext_index"
-)
+# # Delete a database named "mydatabase"
+# client.drop_database("mydatabase")
 
-collection.create_index([("title", "text")], name="title_index")
-
-# Drop an index by its name
-collection.drop_index("multitext_index")
-collection.drop_index("title_index")
+# # Delete a collection
+# db = client["db"]
+# collection = db["my_collection"]
+# collection.drop()
+# # Delete a collection
+# db.drop_collection("my_collection")
 
 # ===============================================
 # Search Text
