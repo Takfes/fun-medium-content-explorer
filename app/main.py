@@ -17,6 +17,13 @@ def connect_mongodb():
     return db[MONGO_COLLECTION]
 
 
+@st.cache_data(ttl=600)
+def mongo_piles():
+    pipeline = [{"$unwind": "$pile"}, {"$group": {"_id": "$pile"}}]
+    unique_pile_values = [doc["_id"] for doc in collection.aggregate(pipeline)]
+    return unique_pile_values
+
+
 @st.cache_data()
 def mongo_search(searchterm: str, filters: dict, limit: int = 100) -> List:
     # Check if whole_string is set in filters
@@ -25,6 +32,10 @@ def mongo_search(searchterm: str, filters: dict, limit: int = 100) -> List:
     # Define the base search query
     query = {"$text": {"$search": searchterm}}
     score = {"score": {"$meta": "textScore"}}
+
+    # Apply piles filter
+    if "piles" in filters:
+        query["pile"] = {"$in": filters["piles"]}
 
     # Apply reading time filter
     if "reading_time" in filters:
@@ -56,24 +67,19 @@ def mongo_search(searchterm: str, filters: dict, limit: int = 100) -> List:
 
 def render_sidebar():
     filters = {}
-    # Enable result limits
-    if st.sidebar.checkbox("📏 Enable result limits"):
-        filters["results_limit"] = st.sidebar.slider(
-            label="Select range for results to show",
-            min_value=5,
-            max_value=250,
-            value=10,
+    # Enable piles filter with multi-select
+    if st.sidebar.checkbox("📚 Enable piles filter"):
+        piles = mongo_piles()
+        selected_piles = st.sidebar.multiselect(
+            label="Select piles to search",
+            options=piles,
+            default=None,
         )
-    # Reading time filter
-    if st.sidebar.checkbox("⏰ Enable reading time filter"):
-        filters["reading_time"] = st.sidebar.slider(
-            label="Select range for reading time",
-            min_value=0,
-            max_value=90,
-            value=(5, 20),
-        )
+        filters["piles"] = selected_piles
+    # Search term match - partial or full
+    filters["whole_string"] = st.sidebar.checkbox("🎚 Search term full match")
     # Date filter - applies to publication date
-    if st.sidebar.checkbox("🗓 Enable minimum publication date filter"):
+    if st.sidebar.checkbox("🗓 Enable minimum publ. date filter"):
         default_date = datetime.datetime(2020, 1, 1)
         min_date = datetime.datetime(2015, 1, 1)
         minimum_date = st.sidebar.date_input(
@@ -82,12 +88,26 @@ def render_sidebar():
             value=default_date,
         )
         filters["minimum_date"] = minimum_date.strftime("%Y-%m-%d")
-    # Search term match - partial or full
-    filters["whole_string"] = st.sidebar.checkbox("🎚 Search term full match")
+    # Reading time filter
+    if st.sidebar.checkbox("⏰ Enable reading time filter"):
+        filters["reading_time"] = st.sidebar.slider(
+            label="Select range for reading time",
+            min_value=0,
+            max_value=90,
+            value=(5, 20),
+        )
     # Claps filter
     if st.sidebar.checkbox("👏 Enable claps filter"):
         filters["claps_limits"] = st.sidebar.slider(
             label="Select minimum # of claps", min_value=0, max_value=1000, value=100
+        )
+    # Enable result limits
+    if st.sidebar.checkbox("📏 Enable result limits"):
+        filters["results_limit"] = st.sidebar.slider(
+            label="Select range for results to show",
+            min_value=5,
+            max_value=250,
+            value=10,
         )
     return filters
 
@@ -134,8 +154,8 @@ load_css("app/styles.css")
 if "results" not in st.session_state:
     st.session_state.results = []
 
-search_filters = render_sidebar()
 collection = connect_mongodb()
+search_filters = render_sidebar()
 st.header("Search Articles")
 
 # Input for search term

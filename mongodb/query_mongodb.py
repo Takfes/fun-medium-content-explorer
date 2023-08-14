@@ -33,6 +33,16 @@ for i, db_name in enumerate(dbs, start=1):
 # db.drop_collection("my_collection")
 
 # ===============================================
+# Get different values for the pile field
+# ===============================================
+
+pipeline = [{"$unwind": "$pile"}, {"$group": {"_id": "$pile"}}]
+
+unique_pile_values = [doc["_id"] for doc in collection.aggregate(pipeline)]
+
+print(unique_pile_values)
+
+# ===============================================
 # Search Text
 # ===============================================
 
